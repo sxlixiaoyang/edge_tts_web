@@ -370,6 +370,15 @@
             if (!isPlaying) {
                 playBtn.textContent = t.play_btn;
             }
+
+            // 重新渲染语言选择下拉菜单（跟随界面语言变化）
+            if (Object.keys(voicesData).length > 0) {
+                var prevLang = $("#language").val();
+                populateLanguages();
+                if (prevLang) {
+                    $("#language").val(prevLang);
+                }
+            }
         }
 
         // 点击外部关闭下拉菜单
