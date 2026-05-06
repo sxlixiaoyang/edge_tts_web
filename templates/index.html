@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -62,48 +62,48 @@
                 <label for="voice" class="form-label">请选择要使用的语音角色:</label>
                 <select id="voice" name="voice" class="form-select">
                     <option value="zh-CN-XiaoxiaoNeural">小小-女</option>
-            <option value="zh-CN-XiaoyiNeural">小逸-女</option>
-<option value="zh-CN-YunjianNeural">云剑-男</option>
-<option value="zh-CN-YunxiNeural">云希-男</option>
-<option value="zh-CN-YunxiaNeural">云夏-男</option>
-<option value="zh-CN-YunyangNeural">云阳-男</option>
-<option value="zh-CN-liaoning-XiaobeiNeural">辽宁小贝-女</option>
-<option value="zh-CN-shaanxi-XiaoniNeural">陕西小妮-女</option>
-<option value="zh-HK-HiuGaaiNeural">香港卓嘉-女</option>
-<option value="zh-HK-HiuMaanNeural">香港卓萌-女</option>
-<option value="zh-HK-WanLungNeural">香港万隆-男</option>
-<option value="zh-TW-HsiaoChenNeural">台湾小陈-女</option>
-<option value="zh-TW-HsiaoYuNeural">台湾小雨-女</option>
-<option value="zh-TW-YunJheNeural">台湾云哲-男</option>
+                    <option value="zh-CN-XiaoyiNeural">小逸-女</option>
+                    <option value="zh-CN-YunjianNeural">云剑-男</option>
+                    <option value="zh-CN-YunxiNeural">云希-男</option>
+                    <option value="zh-CN-YunxiaNeural">云夏-男</option>
+                    <option value="zh-CN-YunyangNeural">云阳-男</option>
+                    <option value="zh-CN-liaoning-XiaobeiNeural">辽宁小贝-女</option>
+                    <option value="zh-CN-shaanxi-XiaoniNeural">陕西小妮-女</option>
+                    <option value="zh-HK-HiuGaaiNeural">香港卓嘉-女</option>
+                    <option value="zh-HK-HiuMaanNeural">香港卓萌-女</option>
+                    <option value="zh-HK-WanLungNeural">香港万隆-男</option>
+                    <option value="zh-TW-HsiaoChenNeural">台湾小陈-女</option>
+                    <option value="zh-TW-HsiaoYuNeural">台湾小雨-女</option>
+                    <option value="zh-TW-YunJheNeural">台湾云哲-男</option>
                 </select>
             </div>
             <div class="mb-3">
                 <label for="rate" class="form-label">调整语速:</label>
                 <select id="rate" name="rate" class="form-select">
                     <option value="-100%">-100</option>
-            <option value="-90%">-90</option>
-            <option value="-80%">-80</option>
-            <option value="-70%">-70</option>
-            <option value="-60%">-60</option>
-            <option value="-50%">-50</option>
-            <option value="-40%">-40</option>
-            <option value="-30%">-30</option>
-            <option value="-20%">-20</option>
-            <option value="-10%">-10</option>
-            <option value="+0%" selected>正常</option>
-            <option value="+10%" >+10</option>
-            <option value="+20%">+20</option>
-            <option value="+30%">+30</option>
-            <option value="+40%">+40</option>
-            <option value="+50%">+50</option>
-            <option value="+60%">+60</option>
-            <option value="+70%">+70</option>
-            <option value="+80%">+80</option>
-            <option value="+90%">+90</option>
-            <option value="+100%">+100</option>
+                    <option value="-90%">-90</option>
+                    <option value="-80%">-80</option>
+                    <option value="-70%">-70</option>
+                    <option value="-60%">-60</option>
+                    <option value="-50%">-50</option>
+                    <option value="-40%">-40</option>
+                    <option value="-30%">-30</option>
+                    <option value="-20%">-20</option>
+                    <option value="-10%">-10</option>
+                    <option value="+0%" selected>正常</option>
+                    <option value="+10%">+10</option>
+                    <option value="+20%">+20</option>
+                    <option value="+30%">+30</option>
+                    <option value="+40%">+40</option>
+                    <option value="+50%">+50</option>
+                    <option value="+60%">+60</option>
+                    <option value="+70%">+70</option>
+                    <option value="+80%">+80</option>
+                    <option value="+90%">+90</option>
+                    <option value="+100%">+100</option>
                 </select>
             </div>
-             <div class="text-center mb-3">
+            <div class="text-center mb-3">
                 <button type="button" id="synthesize-button" class="btn btn-primary">合成音频</button>
             </div>
             <div class="text-center mb-3">
@@ -115,27 +115,37 @@
             </div>
         </form>
     </div>
-        </form>
-    </div>
+    
+    <footer style="text-align: center; padding: 20px 0; font-size: 14px; font-weight: 400; color: #777; margin-top: 100px; border-top: 1px solid #e6e6e6;">
+        &copy; 2023年4月22日 由 <a href="https://www.openai.com/" style="color: #333; text-decoration: none;">ChatGPT</a> 生成
+    </footer>
+    
     <script>
-          var audio;
+        var audio;
         var isPlaying = false;
-         $("#synthesize-button").on("click", function(event) {
+        
+        $("#synthesize-button").on("click", function(event) {
+            var text = $("#text").val().trim();
+            if (!text) {
+                alert("请输入要转换为语音的文本！");
+                return;
+            }
             $(this).prop("disabled", true).text("生成中...");
             requestSynthesis();
         });
-         $("#play-button").on("click", function(event) {
+        
+        $("#play-button").on("click", function(event) {
             if (isPlaying) {
                 audio.pause();
                 audio.currentTime = 0;
                 isPlaying = false;
                 $("#play-button").text("试听");
-                $("#progress-container").slideUp(); // Hide progress container
+                $("#progress-container").slideUp();
             } else {
                 audio.play();
                 isPlaying = true;
                 $("#play-button").text("停止");
-                $("#progress-container").slideDown(); // Show progress container
+                $("#progress-container").slideDown();
 
                 // Update progress bar
                 audio.addEventListener("timeupdate", function () {
@@ -147,18 +157,19 @@
                 audio.addEventListener("ended", function () {
                     isPlaying = false;
                     $("#play-button").text("试听");
-                    $("#progress-container").slideUp(); // Hide progress container
+                    $("#progress-container").slideUp();
                     $("#progress-bar").css("width", 0 + "%").attr("aria-valuenow", 0);
                 });
             }
         });
 
-         function requestSynthesis() {
+        function requestSynthesis() {
             var form_data = {
                 'text': $("#text").val(),
                 'voice': $("#voice").val(),
                 'rate': $("#rate").val()
-            }
+            };
+            
             $.ajax({
                 url: "/synthesize",
                 type: "POST",
@@ -166,7 +177,7 @@
                 data: JSON.stringify(form_data),
                 success: function(response){
                     var download_link = response['download_link'];
-                    $("#download-link").html( `<a href="${download_link}" class="btn btn-success" download>下载语音文件</a>` ).show();
+                    $("#download-link").html(`<a href="${download_link}" class="btn btn-success" download>下载语音文件</a>`).show();
                     audio = new Audio(download_link);
                     isPlaying = false;
                     $("#synthesize-button").prop("disabled", false).text("合成音频");
@@ -175,12 +186,13 @@
                         isPlaying = false;
                         $("#play-button").text("试听");
                     });
+                },
+                error: function(xhr, status, error) {
+                    alert("合成失败，请稍后重试！错误：" + error);
+                    $("#synthesize-button").prop("disabled", false).text("合成音频");
                 }
             });
         }
     </script>
 </body>
-<footer style="text-align: center; padding: 20px 0; font-size: 14px; font-weight: 400; color: #777; margin-top: 100px; border-top: 1px solid #e6e6e6;">
-        &copy; 2023年4月22日 由 <a href="https://www.openai.com/" style="color: #333; text-decoration: none;">ChatGPT</a> 生成
-</footer>
 </html>
