@@ -66,6 +66,26 @@
             top: 20px;
             right: 20px;
             z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+        .api-nav-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 5px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+        }
+        .api-nav-btn:hover {
+            opacity: 0.9;
+            color: white;
         }
         .lang-btn {
             background: white;
@@ -111,6 +131,7 @@
 <body>
     <!-- 语言切换器 -->
     <div class="lang-switcher">
+        <a href="/api" class="api-nav-btn" data-i18n="api_nav"><i class="fas fa-code"></i> API</a>
         <button class="lang-btn" onclick="toggleLangDropdown()">
             <span id="current-lang">🇨🇳 中文</span> ▼
         </button>
@@ -214,7 +235,8 @@
                 alert_no_text: "请输入要转换为语音的文本！",
                 alert_no_voice: "请选择语音角色！",
                 alert_error: "合成失败，请稍后重试！错误：",
-                current_lang: "🇨🇳 中文"
+                current_lang: "🇨🇳 中文",
+                api_nav: "<i class='fas fa-code'></i> API"
             },
             en: {
                 title: "Text to Speech v2.0",
@@ -234,7 +256,8 @@
                 alert_no_text: "Please enter text to convert!",
                 alert_no_voice: "Please select a voice!",
                 alert_error: "Synthesis failed, please try again later! Error: ",
-                current_lang: "🇺🇸 English"
+                current_lang: "🇺🇸 English",
+                api_nav: "<i class='fas fa-code'></i> API"
             },
             ja: {
                 title: "テキスト読み上げ v2.0",
@@ -254,11 +277,12 @@
                 alert_no_text: "音声に変換するテキストを入力してください！",
                 alert_no_voice: "音声を選択してください！",
                 alert_error: "合成に失敗しました。後でもう一度お試しください！エラー: ",
-                current_lang: "🇯🇵 日本語"
+                current_lang: "🇯🇵 日本語",
+                api_nav: "<i class='fas fa-code'></i> API"
             },
             ko: {
                 title: "텍스트 음성 변환 v2.0",
-                subtitle: "75개 언어 · 322개 음성 · 무료 온라인",
+                subtitle: "75개 언어 · 322개 음성 · 물질 온라인",
                 input_label: "음성으로 변환할 텍스트 입력:",
                 input_placeholder: "텍스트를 입력하세요...",
                 language_label: "언어 선택:",
@@ -274,7 +298,8 @@
                 alert_no_text: "음성으로 변환할 텍스트를 입력하세요!",
                 alert_no_voice: "음성을 선택하세요!",
                 alert_error: "합성에 실패했습니다. 나중에 다시 시도하세요! 오류: ",
-                current_lang: "🇰🇷 한국어"
+                current_lang: "🇰🇷 한국어",
+                api_nav: "<i class='fas fa-code'></i> API"
             },
             vi: {
                 title: "Chuyển văn bản thành giọng nói v2.0",
@@ -294,7 +319,8 @@
                 alert_no_text: "Vui lòng nhập văn bản để chuyển đổi!",
                 alert_no_voice: "Vui lòng chọn giọng nói!",
                 alert_error: "Tổng hợp thất bại, vui lòng thử lại sau! Lỗi: ",
-                current_lang: "🇻🇳 Tiếng Việt"
+                current_lang: "🇻🇳 Tiếng Việt",
+                api_nav: "<i class='fas fa-code'></i> API"
             },
             hi: {
                 title: "टेक्स्ट टू स्पीच v2.0",
@@ -314,7 +340,8 @@
                 alert_no_text: "कृपया आवाज में बदलने के लिए टेक्स्ट दर्ज करें!",
                 alert_no_voice: "कृपया आवाज चुनें!",
                 alert_error: "संश्लेषण विफल, कृपया बाद में पुनः प्रयास करें! त्रुटि: ",
-                current_lang: "🇮🇳 हिन्दी"
+                current_lang: "🇮🇳 हिन्दी",
+                api_nav: "<i class='fas fa-code'></i> API"
             }
         };
 

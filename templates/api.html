@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation - Edge TTS Web</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0-alpha1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 0 40px;
+            margin-bottom: 40px;
+        }
+        .hero h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; }
+        .hero p { font-size: 1.1rem; opacity: 0.9; }
+        .api-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .api-section h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #eee;
+        }
+        .method-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: white;
+            min-width: 60px;
+            text-align: center;
+        }
+        .method-get { background-color: #61affe; }
+        .method-post { background-color: #49cc90; }
+        .endpoint {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.95rem;
+            background: #f4f4f5;
+            padding: 8px 14px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 8px;
+            padding: 1.2rem;
+            overflow-x: auto;
+            font-size: 0.9rem;
+        }
+        pre code { color: inherit; }
+        .json-key { color: #9cdcfe; }
+        .json-string { color: #ce9178; }
+        .json-number { color: #b5cea8; }
+        .param-table th { background: #f8f9fa; font-weight: 600; }
+        .param-table td, .param-table th { padding: 10px 14px; border-bottom: 1px solid #eee; }
+        .status-ok { color: #28a745; font-weight: 600; }
+        .status-err { color: #dc3545; font-weight: 600; }
+        .try-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .try-btn:hover { opacity: 0.9; }
+        .try-result {
+            margin-top: 10px;
+            display: none;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+        .back-link:hover { color: white; }
+        .quick-start {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .quick-start h3 { font-weight: 700; margin-bottom: 0.8rem; }
+        .quick-start code {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <div class="container">
+            <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Back to TTS</a>
+            <h1><i class="fas fa-book"></i> API Documentation</h1>
+            <p>Edge TTS Web API - Free Text-to-Speech API, no registration required</p>
+        </div>
+    </div>
+
+    <div class="container" style="max-width: 900px;">
+        <!-- Quick Start -->
+        <div class="quick-start">
+            <h3><i class="fas fa-rocket"></i> Quick Start</h3>
+            <p style="margin-bottom: 10px;">No API key needed! Just send a POST request to synthesize speech:</p>
+            <pre style="background: rgba(0,0,0,0.2); border: none; margin: 0;"><code>curl -X POST <span id="quick-url">YOUR_DOMAIN</span>/synthesize \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Hello World", "voice": "en-US-JennyNeural", "rate": "+0%"}'</code></pre>
+        </div>
+
+        <!-- API: Get Voices -->
+        <div class="api-section">
+            <h2><i class="fas fa-list"></i> Get Voice List</h2>
+            <p>Get all available voices grouped by language.</p>
+            
+            <div style="display: flex; align-items: center; gap: 10px; margin: 15px 0;">
+                <span class="method-badge method-get">GET</span>
+                <span class="endpoint">/api/voices</span>
+            </div>
+
+            <h5 style="margin-top: 20px;">Parameters</h5>
+            <p>None</p>
+
+            <h5>Response</h5>
+            <pre><code>{
+  <span class="json-key">"message"</span>: <span class="json-string">"success"</span>,
+  <span class="json-key">"voices"</span>: {
+    <span class="json-key">"Chinese"</span>: {
+      <span class="json-key">"zh-CN"</span>: [
+        {
+          <span class="json-key">"name"</span>: <span class="json-string">"zh-CN-XiaoxiaoNeural"</span>,
+          <span class="json-key">"gender"</span>: <span class="json-string">"女"</span>,
+          <span class="json-key">"display_name"</span>: <span class="json-string">"小小"</span>
+        }
+      ]
+    }
+  }
+}</code></pre>
+
+            <button class="try-btn mt-3" onclick="tryGetVoices()"><i class="fas fa-play"></i> Try it</button>
+            <div class="try-result" id="try-voices-result">
+                <pre><code id="try-voices-output"></code></pre>
+            </div>
+        </div>
+
+        <!-- API: Synthesize -->
+        <div class="api-section">
+            <h2><i class="fas fa-microphone"></i> Synthesize Speech</h2>
+            <p>Convert text to speech and get a download link.</p>
+            
+            <div style="display: flex; align-items: center; gap: 10px; margin: 15px 0;">
+                <span class="method-badge method-post">POST</span>
+                <span class="endpoint">/synthesize</span>
+            </div>
+
+            <h5 style="margin-top: 20px;">Request Headers</h5>
+            <table class="table param-table" style="max-width: 400px;">
+                <thead><tr><th>Header</th><th>Value</th></tr></thead>
+                <tbody>
+                    <tr><td>Content-Type</td><td><code>application/json</code></td></tr>
+                </tbody>
+            </table>
+
+            <h5>Request Body</h5>
+            <table class="table param-table">
+                <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td><code>text</code></td>
+                        <td>string</td>
+                        <td><span class="status-ok">Yes</span></td>
+                        <td>Text to convert to speech</td>
+                    </tr>
+                    <tr>
+                        <td><code>voice</code></td>
+                        <td>string</td>
+                        <td>No</td>
+                        <td>Voice name (default: zh-CN-XiaoxiaoNeural). Get from /api/voices</td>
+                    </tr>
+                    <tr>
+                        <td><code>rate</code></td>
+                        <td>string</td>
+                        <td>No</td>
+                        <td>Speech rate: "-100%" to "+100%" (default: "+0%")</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h5>Request Example</h5>
+            <pre><code>{
+  <span class="json-key">"text"</span>: <span class="json-string">"Hello, this is a test."</span>,
+  <span class="json-key">"voice"</span>: <span class="json-string">"en-US-JennyNeural"</span>,
+  <span class="json-key">"rate"</span>: <span class="json-string">"+0%"</span>
+}</code></pre>
+
+            <h5>Success Response <span class="status-ok">200</span></h5>
+            <pre><code>{
+  <span class="json-key">"message"</span>: <span class="json-string">"success"</span>,
+  <span class="json-key">"download_link"</span>: <span class="json-string">"/mp3/abc123def456.mp3"</span>
+}</code></pre>
+
+            <h5>Error Response <span class="status-err">400/500</span></h5>
+            <pre><code>{
+  <span class="json-key">"message"</span>: <span class="json-string">"error"</span>,
+  <span class="json-key">"error"</span>: <span class="json-string">"文本不能为空"</span>
+}</code></pre>
+
+            <h5>Try it</h5>
+            <div class="row g-3" style="max-width: 600px;">
+                <div class="col-12">
+                    <label class="form-label">Text</label>
+                    <input type="text" class="form-control" id="try-text" value="Hello, this is a test." placeholder="Enter text...">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Voice</label>
+                    <input type="text" class="form-control" id="try-voice" value="en-US-JennyNeural" placeholder="Voice name">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Rate</label>
+                    <select class="form-control" id="try-rate">
+                        <option value="-50%">-50%</option>
+                        <option value="-20%">-20%</option>
+                        <option value="+0%" selected>Normal</option>
+                        <option value="+20%">+20%</option>
+                        <option value="+50%">+50%</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <button class="try-btn" onclick="trySynthesize()"><i class="fas fa-play"></i> Send Request</button>
+                </div>
+            </div>
+            <div class="try-result" id="try-synth-result">
+                <h6>Response:</h6>
+                <pre><code id="try-synth-output"></code></pre>
+                <div id="try-synth-player" style="display:none; margin-top: 10px;">
+                    <audio id="try-audio" controls></audio>
+                </div>
+            </div>
+        </div>
+
+        <!-- API: Download -->
+        <div class="api-section">
+            <h2><i class="fas fa-download"></i> Download Audio</h2>
+            <p>Download a generated MP3 file using the link from synthesize response.</p>
+            
+            <div style="display: flex; align-items: center; gap: 10px; margin: 15px 0;">
+                <span class="method-badge method-get">GET</span>
+                <span class="endpoint">/mp3/{filename}</span>
+            </div>
+
+            <h5 style="margin-top: 20px;">Parameters</h5>
+            <table class="table param-table" style="max-width: 400px;">
+                <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td><code>filename</code></td>
+                        <td>string</td>
+                        <td>MP3 filename (from synthesize response)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h5>Usage</h5>
+            <p>Simply open the <code>download_link</code> from the synthesize response in your browser, or use it programmatically:</p>
+            <pre><code><span style="color:#569cd6">import</span> requests
+
+<span style="color:#dcdcaa">response</span> = requests.post(
+    <span class="json-string">"https://your-domain.com/synthesize"</span>,
+    json={
+        <span class="json-string">"text"</span>: <span class="json-string">"Hello World"</span>,
+        <span class="json-string">"voice"</span>: <span class="json-string">"en-US-JennyNeural"</span>
+    }
+)
+data = response.json()
+audio_url = <span class="json-string">f"https://your-domain.com{data['download_link']}"</span>
+
+<span style="color:#6a9955"># Download the file</span>
+audio = requests.get(audio_url)
+<span style="color:#569cd6">with</span> <span style="color:#569cd6">open</span>(<span class="json-string">"output.mp3"</span>, <span class="json-string">"wb"</span>) <span style="color:#569cd6">as</span> f:
+    f.write(audio.content)</code></pre>
+        </div>
+
+        <!-- Supported Languages -->
+        <div class="api-section">
+            <h2><i class="fas fa-globe"></i> Popular Voice Examples</h2>
+            <table class="table param-table">
+                <thead><tr><th>Language</th><th>Voice Name</th><th>Gender</th></tr></thead>
+                <tbody>
+                    <tr><td>Chinese (CN)</td><td><code>zh-CN-XiaoxiaoNeural</code></td><td>Female</td></tr>
+                    <tr><td>Chinese (CN)</td><td><code>zh-CN-YunjianNeural</code></td><td>Male</td></tr>
+                    <tr><td>Chinese (HK)</td><td><code>zh-HK-HiuGaaiNeural</code></td><td>Female</td></tr>
+                    <tr><td>Chinese (TW)</td><td><code>zh-TW-HsiaoChenNeural</code></td><td>Female</td></tr>
+                    <tr><td>English (US)</td><td><code>en-US-JennyNeural</code></td><td>Female</td></tr>
+                    <tr><td>English (US)</td><td><code>en-US-GuyNeural</code></td><td>Male</td></tr>
+                    <tr><td>English (UK)</td><td><code>en-GB-SoniaNeural</code></td><td>Female</td></tr>
+                    <tr><td>Japanese</td><td><code>ja-JP-NanamiNeural</code></td><td>Female</td></tr>
+                    <tr><td>Korean</td><td><code>ko-KR-SunHiNeural</code></td><td>Female</td></tr>
+                    <tr><td>Spanish</td><td><code>es-ES-ElviraNeural</code></td><td>Female</td></tr>
+                    <tr><td>French</td><td><code>fr-FR-DeniseNeural</code></td><td>Female</td></tr>
+                    <tr><td>German</td><td><code>de-DE-KatjaNeural</code></td><td>Female</td></tr>
+                    <tr><td>Russian</td><td><code>ru-RU-SvetlanaNeural</code></td><td>Female</td></tr>
+                    <tr><td>Vietnamese</td><td><code>vi-VN-HoaiMyNeural</code></td><td>Female</td></tr>
+                    <tr><td>Hindi</td><td><code>hi-IN-SwaraNeural</code></td><td>Female</td></tr>
+                    <tr><td>Thai</td><td><code>th-TH-PremwadeeNeural</code></td><td>Female</td></tr>
+                    <tr><td>Arabic</td><td><code>ar-SA-ZariyahNeural</code></td><td>Female</td></tr>
+                </tbody>
+            </table>
+            <p class="text-muted mt-2" style="font-size: 0.9rem;">For the complete list of 322+ voices, call <code>GET /api/voices</code>.</p>
+        </div>
+
+        <!-- Notes -->
+        <div class="api-section">
+            <h2><i class="fas fa-info-circle"></i> Notes</h2>
+            <ul>
+                <li><strong>No API key required</strong> — This service is completely free, powered by Microsoft Edge's online TTS.</li>
+                <li><strong>No rate limit</strong> — But please use reasonably and avoid abuse.</li>
+                <li><strong>Text length</strong> — Recommended to keep text under 5000 characters per request for best results.</li>
+                <li><strong>Audio format</strong> — Output is MP3 format.</li>
+                <li><strong>File retention</strong> — Generated files are stored locally on the server. No cloud storage.</li>
+                <li><strong>Base URL</strong> — Replace <code>YOUR_DOMAIN</code> with your actual deployment domain (e.g., <code>https://your-domain.com</code>).</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; padding: 30px 0; color: #999; font-size: 0.85rem;">
+            Edge TTS Web API Documentation &copy; 2025
+        </div>
+    </div>
+
+    <script>
+        // Set the domain in quick start
+        document.getElementById('quick-url').textContent = location.origin;
+
+        function tryGetVoices() {
+            const output = document.getElementById('try-voices-output');
+            const result = document.getElementById('try-voices-result');
+            output.textContent = 'Loading...';
+            result.style.display = 'block';
+
+            fetch('/api/voices')
+                .then(r => r.json())
+                .then(data => {
+                    // Show language count summary
+                    const langs = Object.keys(data.voices || {});
+                    let totalVoices = 0;
+                    langs.forEach(l => {
+                        Object.values(data.voices[l]).forEach(v => totalVoices += v.length);
+                    });
+                    const summary = { message: data.message, total_languages: langs.length, total_voices: totalVoices, languages: langs.slice(0, 10).join(', ') + (langs.length > 10 ? '...' : '') };
+                    output.textContent = JSON.stringify(summary, null, 2);
+                })
+                .catch(err => {
+                    output.textContent = 'Error: ' + err.message;
+                });
+        }
+
+        function trySynthesize() {
+            const text = document.getElementById('try-text').value;
+            const voice = document.getElementById('try-voice').value;
+            const rate = document.getElementById('try-rate').value;
+            const output = document.getElementById('try-synth-output');
+            const result = document.getElementById('try-synth-result');
+            const player = document.getElementById('try-synth-player');
+
+            if (!text) { alert('Please enter text!'); return; }
+
+            output.textContent = 'Processing...';
+            result.style.display = 'block';
+            player.style.display = 'none';
+
+            fetch('/synthesize', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text, voice, rate })
+            })
+                .then(r => r.json())
+                .then(data => {
+                    output.textContent = JSON.stringify(data, null, 2);
+                    if (data.message === 'success') {
+                        player.style.display = 'block';
+                        document.getElementById('try-audio').src = data.download_link;
+                    }
+                })
+                .catch(err => {
+                    output.textContent = 'Error: ' + err.message;
+                });
+        }
+    </script>
+</body>
+</html>

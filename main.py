@@ -150,6 +150,14 @@ async def index(request: Request):
     return HTMLResponse(content=html_content)
 
 
+@app.get("/api", response_class=HTMLResponse)
+async def api_docs(request: Request):
+    """API文档页面"""
+    template = templates.get_template("api.html")
+    html_content = template.render(request=request)
+    return HTMLResponse(content=html_content)
+
+
 @app.get("/api/voices")
 async def get_voices_api():
     """API: 获取所有支持的语音列表"""
