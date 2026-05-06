@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>在线语音合成 Powered By ChatGPT</title>
     <meta name="keywords" content="文字转语音,语音合成,微软语音合成,免费文本转语音,免费语音合成,在线文字转语音">
-    <meta name="description" content="在线免费语音合成，多种音源选择，支持语速调节！">
+    <meta name="description" content="在线免费语音合成，支持75种语言、322种音源选择，支持语速调节！">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0-alpha1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -14,7 +14,7 @@
             background-color: #f8f9fa;
         }
         .container {
-            max-width: 700px;
+            max-width: 800px;
         }
         h1 {
             font-size: 2.5rem;
@@ -47,36 +47,101 @@
             background-color: #218838;
             border-color: #1e7e34;
         }
+        .voice-select-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .lang-group {
+            margin-bottom: 0.5rem;
+        }
+        .lang-header {
+            background-color: #f8f9fa;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .lang-header:hover {
+            background-color: #e9ecef;
+        }
+        .lang-voices {
+            padding: 0.5rem 1rem;
+            display: none;
+        }
+        .lang-voices.show {
+            display: block;
+        }
+        .voice-option {
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 0.25rem 0;
+        }
+        .voice-option:hover {
+            background-color: #e9ecef;
+        }
+        .voice-option.selected {
+            background-color: #007bff;
+            color: white;
+        }
+        .voice-tag {
+            font-size: 0.75rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            margin-left: 0.5rem;
+        }
+        .voice-tag.male {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        .voice-tag.female {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1 class="text-center my-5">语音合成v1.0</h1>
+        <h1 class="text-center my-5">语音合成v2.0</h1>
+        <p class="text-center text-muted mb-4">支持75种语言 · 322种音源 · 免费在线使用</p>
+        
         <form id="synthesize-form">
             <div class="mb-3">
                 <label for="text" class="form-label">请输入要转换为语音的文本:</label>
-                <textarea id="text" name="text" rows="4" class="form-control"></textarea>
+                <textarea id="text" name="text" rows="4" class="form-control" placeholder="请输入文本..."></textarea>
             </div>
+            
             <div class="mb-3">
-                <label for="voice" class="form-label">请选择要使用的语音角色:</label>
-                <select id="voice" name="voice" class="form-select">
-                    <option value="zh-CN-XiaoxiaoNeural">小小-女</option>
-                    <option value="zh-CN-XiaoyiNeural">小逸-女</option>
-                    <option value="zh-CN-YunjianNeural">云剑-男</option>
-                    <option value="zh-CN-YunxiNeural">云希-男</option>
-                    <option value="zh-CN-YunxiaNeural">云夏-男</option>
-                    <option value="zh-CN-YunyangNeural">云阳-男</option>
-                    <option value="zh-CN-liaoning-XiaobeiNeural">辽宁小贝-女</option>
-                    <option value="zh-CN-shaanxi-XiaoniNeural">陕西小妮-女</option>
-                    <option value="zh-HK-HiuGaaiNeural">香港卓嘉-女</option>
-                    <option value="zh-HK-HiuMaanNeural">香港卓萌-女</option>
-                    <option value="zh-HK-WanLungNeural">香港万隆-男</option>
-                    <option value="zh-TW-HsiaoChenNeural">台湾小陈-女</option>
-                    <option value="zh-TW-HsiaoYuNeural">台湾小雨-女</option>
-                    <option value="zh-TW-YunJheNeural">台湾云哲-男</option>
+                <label class="form-label">选择语言:</label>
+                <select id="language" class="form-select mb-2">
+                    <option value="">-- 请选择语言 --</option>
                 </select>
             </div>
+            
+            <div class="mb-3">
+                <label class="form-label">选择语音角色:</label>
+                <select id="voice" name="voice" class="form-select">
+                    <option value="">-- 请先选择语言 --</option>
+                </select>
+            </div>
+            
             <div class="mb-3">
                 <label for="rate" class="form-label">调整语速:</label>
                 <select id="rate" name="rate" class="form-select">
@@ -103,9 +168,11 @@
                     <option value="+100%">+100</option>
                 </select>
             </div>
+            
             <div class="text-center mb-3">
                 <button type="button" id="synthesize-button" class="btn btn-primary">合成音频</button>
             </div>
+            
             <div class="text-center mb-3">
                 <button type="button" id="play-button" class="btn btn-success" style="display:none;">试听</button>
                 <div id="progress-container" class="progress mt-2" style="display:none; max-width: 200px; margin-left: auto; margin-right: auto;">
@@ -117,19 +184,128 @@
     </div>
     
     <footer style="text-align: center; padding: 20px 0; font-size: 14px; font-weight: 400; color: #777; margin-top: 100px; border-top: 1px solid #e6e6e6;">
-        &copy; 2023年4月22日 由 <a href="https://www.openai.com/" style="color: #333; text-decoration: none;">ChatGPT</a> 生成
+        &copy; 2023年4月22日 由 <a href="https://www.openai.com/" style="color: #333; text-decoration: none;">ChatGPT</a> 生成 · 支持75种语言
     </footer>
     
     <script>
         var audio;
         var isPlaying = false;
+        var voicesData = {};
+        
+        // 页面加载时获取语音列表
+        $(document).ready(function() {
+            loadVoices();
+        });
+        
+        function loadVoices() {
+            $.ajax({
+                url: "/api/voices",
+                type: "GET",
+                success: function(response) {
+                    if (response.message === "success") {
+                        voicesData = response.voices;
+                        populateLanguages();
+                    }
+                },
+                error: function() {
+                    // 如果API获取失败，使用默认语音列表
+                    loadDefaultVoices();
+                }
+            });
+        }
+        
+        function loadDefaultVoices() {
+            // 默认中文语音列表
+            var defaultVoices = {
+                "中文": {
+                    "zh-CN": [
+                        {name: "zh-CN-XiaoxiaoNeural", gender: "女", display_name: "小小"},
+                        {name: "zh-CN-XiaoyiNeural", gender: "女", display_name: "小逸"},
+                        {name: "zh-CN-YunjianNeural", gender: "男", display_name: "云剑"},
+                        {name: "zh-CN-YunxiNeural", gender: "男", display_name: "云希"},
+                        {name: "zh-CN-YunxiaNeural", gender: "男", display_name: "云夏"},
+                        {name: "zh-CN-YunyangNeural", gender: "男", display_name: "云阳"},
+                        {name: "zh-CN-liaoning-XiaobeiNeural", gender: "女", display_name: "辽宁小贝"},
+                        {name: "zh-CN-shaanxi-XiaoniNeural", gender: "女", display_name: "陕西小妮"}
+                    ],
+                    "zh-HK": [
+                        {name: "zh-HK-HiuGaaiNeural", gender: "女", display_name: "香港卓嘉"},
+                        {name: "zh-HK-HiuMaanNeural", gender: "女", display_name: "香港卓萌"},
+                        {name: "zh-HK-WanLungNeural", gender: "男", display_name: "香港万隆"}
+                    ],
+                    "zh-TW": [
+                        {name: "zh-TW-HsiaoChenNeural", gender: "女", display_name: "台湾小陈"},
+                        {name: "zh-TW-HsiaoYuNeural", gender: "女", display_name: "台湾小雨"},
+                        {name: "zh-TW-YunJheNeural", gender: "男", display_name: "台湾云哲"}
+                    ]
+                }
+            };
+            voicesData = defaultVoices;
+            populateLanguages();
+        }
+        
+        function populateLanguages() {
+            var $langSelect = $("#language");
+            $langSelect.empty();
+            $langSelect.append('<option value="">-- 请选择语言 --</option>');
+            
+            // 按字母顺序排序语言
+            var sortedLanguages = Object.keys(voicesData).sort();
+            
+            // 将中文放在最前面
+            if (sortedLanguages.includes("中文")) {
+                sortedLanguages = ["中文"].concat(sortedLanguages.filter(l => l !== "中文"));
+            }
+            
+            $.each(sortedLanguages, function(index, lang) {
+                var voiceCount = 0;
+                $.each(voicesData[lang], function(region, voices) {
+                    voiceCount += voices.length;
+                });
+                $langSelect.append(`<option value="${lang}">${lang} (${voiceCount}个音源)</option>`);
+            });
+        }
+        
+        function populateVoices(language) {
+            var $voiceSelect = $("#voice");
+            $voiceSelect.empty();
+            $voiceSelect.append('<option value="">-- 请选择语音角色 --</option>');
+            
+            if (!language || !voicesData[language]) {
+                return;
+            }
+            
+            var regions = voicesData[language];
+            $.each(regions, function(region, voices) {
+                var $optgroup = $(`<optgroup label="${region}"></optgroup>`);
+                $.each(voices, function(index, voice) {
+                    var genderClass = voice.gender === "男" ? "male" : "female";
+                    var genderText = voice.gender === "男" ? "男" : "女";
+                    $optgroup.append(`<option value="${voice.name}">${voice.display_name} <span class="voice-tag ${genderClass}">${genderText}</span></option>`);
+                });
+                $voiceSelect.append($optgroup);
+            });
+        }
+        
+        // 语言选择变化时更新语音列表
+        $("#language").on("change", function() {
+            var selectedLang = $(this).val();
+            populateVoices(selectedLang);
+        });
         
         $("#synthesize-button").on("click", function(event) {
             var text = $("#text").val().trim();
+            var voice = $("#voice").val();
+            
             if (!text) {
                 alert("请输入要转换为语音的文本！");
                 return;
             }
+            if (!voice) {
+                alert("请选择语音角色！");
+                return;
+            }
+            
             $(this).prop("disabled", true).text("生成中...");
             requestSynthesis();
         });
@@ -147,13 +323,11 @@
                 $("#play-button").text("停止");
                 $("#progress-container").slideDown();
 
-                // Update progress bar
                 audio.addEventListener("timeupdate", function () {
                     var progress = (audio.currentTime / audio.duration) * 100;
                     $("#progress-bar").css("width", progress + "%").attr("aria-valuenow", progress);
                 });
 
-                // Reset progress bar on ended
                 audio.addEventListener("ended", function () {
                     isPlaying = false;
                     $("#play-button").text("试听");

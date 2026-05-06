@@ -1,16 +1,19 @@
-from fastapi import FastAPI, Request, Form, File
-from fastapi.responses import JSONResponse, FileResponse
-from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse, FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 import edge_tts
-import asyncio
 import hashlib
 import datetime
 import os
 import tempfile
+import asyncio
 
 app = FastAPI()
-templates = Jinja2Templates(directory="templates")
+
+# 创建模板目录路径
+templates_dir = os.path.join(os.path.dirname(__file__), "templates")
+templates = Jinja2Templates(directory=templates_dir)
 
 # 创建mp3目录
 output_dir = os.path.join(os.path.dirname(__file__), "mp3")
@@ -19,6 +22,114 @@ if not os.path.exists(output_dir):
 
 # 挂载静态文件目录
 app.mount("/mp3", StaticFiles(directory=output_dir), name="mp3")
+
+# 语言名称映射
+LANGUAGE_NAMES = {
+    "af": "南非荷兰语",
+    "am": "阿姆哈拉语",
+    "ar": "阿拉伯语",
+    "az": "阿塞拜疆语",
+    "bg": "保加利亚语",
+    "bn": "孟加拉语",
+    "bs": "波斯尼亚语",
+    "ca": "加泰罗尼亚语",
+    "cs": "捷克语",
+    "cy": "威尔士语",
+    "da": "丹麦语",
+    "de": "德语",
+    "el": "希腊语",
+    "en": "英语",
+    "es": "西班牙语",
+    "et": "爱沙尼亚语",
+    "fa": "波斯语",
+    "fi": "芬兰语",
+    "fil": "菲律宾语",
+    "fr": "法语",
+    "ga": "爱尔兰语",
+    "gl": "加利西亚语",
+    "gu": "古吉拉特语",
+    "he": "希伯来语",
+    "hi": "印地语",
+    "hr": "克罗地亚语",
+    "hu": "匈牙利语",
+    "hy": "亚美尼亚语",
+    "id": "印尼语",
+    "is": "冰岛语",
+    "it": "意大利语",
+    "iu": "因纽特语",
+    "ja": "日语",
+    "jv": "爪哇语",
+    "ka": "格鲁吉亚语",
+    "kk": "哈萨克语",
+    "km": "高棉语",
+    "kn": "卡纳达语",
+    "ko": "韩语",
+    "lo": "老挝语",
+    "lt": "立陶宛语",
+    "lv": "拉脱维亚语",
+    "mk": "马其顿语",
+    "ml": "马拉雅拉姆语",
+    "mn": "蒙古语",
+    "mr": "马拉地语",
+    "ms": "马来语",
+    "mt": "马耳他语",
+    "my": "缅甸语",
+    "nb": "挪威语",
+    "ne": "尼泊尔语",
+    "nl": "荷兰语",
+    "pl": "波兰语",
+    "ps": "普什图语",
+    "pt": "葡萄牙语",
+    "ro": "罗马尼亚语",
+    "ru": "俄语",
+    "si": "僧伽罗语",
+    "sk": "斯洛伐克语",
+    "sl": "斯洛文尼亚语",
+    "so": "索马里语",
+    "sq": "阿尔巴尼亚语",
+    "sr": "塞尔维亚语",
+    "su": "巽他语",
+    "sv": "瑞典语",
+    "sw": "斯瓦希里语",
+    "ta": "泰米尔语",
+    "te": "泰卢固语",
+    "th": "泰语",
+    "tr": "土耳其语",
+    "uk": "乌克兰语",
+    "ur": "乌尔都语",
+    "uz": "乌兹别克语",
+    "vi": "越南语",
+    "zh": "中文",
+    "zu": "祖鲁语"
+}
+
+
+async def get_voices():
+    """获取所有语音列表"""
+    voices = await edge_tts.list_voices()
+    result = {}
+    for v in voices:
+        locale = v['Locale']
+        lang_code = locale.split('-')[0]
+        lang_name = LANGUAGE_NAMES.get(lang_code, lang_code)
+        
+        if lang_name not in result:
+            result[lang_name] = {}
+        
+        # 构建地区显示名称
+        region = locale.split('-')[-1] if '-' in locale else locale
+        region_display = f"{locale}"
+        
+        if region_display not in result[lang_name]:
+            result[lang_name][region_display] = []
+        
+        result[lang_name][region_display].append({
+            'name': v['ShortName'],
+            'gender': '男' if v['Gender'] == 'Male' else '女',
+            'display_name': v['ShortName'].split('-')[-1].replace('Neural', '')
+        })
+    
+    return result
 
 
 async def my_function(text, output, voice, rate):
@@ -32,9 +143,24 @@ async def my_function(text, output, voice, rate):
         return False
 
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    template = templates.get_template("index.html")
+    html_content = template.render(request=request)
+    return HTMLResponse(content=html_content)
+
+
+@app.get("/api/voices")
+async def get_voices_api():
+    """API: 获取所有支持的语音列表"""
+    try:
+        voices = await get_voices()
+        return JSONResponse(content={"message": "success", "voices": voices})
+    except Exception as e:
+        return JSONResponse(
+            content={"message": "error", "error": str(e)},
+            status_code=500
+        )
 
 
 @app.post("/synthesize")
