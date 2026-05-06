@@ -47,46 +47,6 @@
             background-color: #218838;
             border-color: #1e7e34;
         }
-        .voice-select-container {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .lang-group {
-            margin-bottom: 0.5rem;
-        }
-        .lang-header {
-            background-color: #f8f9fa;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .lang-header:hover {
-            background-color: #e9ecef;
-        }
-        .lang-voices {
-            padding: 0.5rem 1rem;
-            display: none;
-        }
-        .lang-voices.show {
-            display: block;
-        }
-        .voice-option {
-            padding: 0.25rem 0.5rem;
-            cursor: pointer;
-            border-radius: 4px;
-            margin: 0.25rem 0;
-        }
-        .voice-option:hover {
-            background-color: #e9ecef;
-        }
-        .voice-option.selected {
-            background-color: #007bff;
-            color: white;
-        }
         .voice-tag {
             font-size: 0.75rem;
             padding: 0.1rem 0.4rem;
@@ -101,49 +61,95 @@
             background-color: #f8d7da;
             color: #721c24;
         }
-        .loading-spinner {
-            display: inline-block;
-            width: 1rem;
-            height: 1rem;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #3498db;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .lang-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .lang-btn {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 5px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .lang-btn:hover {
+            background: #f0f0f0;
+        }
+        .lang-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: none;
+            min-width: 150px;
+        }
+        .lang-dropdown.show {
+            display: block;
+        }
+        .lang-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .lang-option:hover {
+            background: #f5f5f5;
+        }
+        .lang-option.active {
+            background: #007bff;
+            color: white;
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
+    <!-- 语言切换器 -->
+    <div class="lang-switcher">
+        <button class="lang-btn" onclick="toggleLangDropdown()">
+            <span id="current-lang">🇨🇳 中文</span> ▼
+        </button>
+        <div class="lang-dropdown" id="lang-dropdown">
+            <div class="lang-option active" data-lang="zh" onclick="switchLanguage('zh')">🇨🇳 中文</div>
+            <div class="lang-option" data-lang="en" onclick="switchLanguage('en')">🇺🇸 English</div>
+            <div class="lang-option" data-lang="ja" onclick="switchLanguage('ja')">🇯🇵 日本語</div>
+            <div class="lang-option" data-lang="ko" onclick="switchLanguage('ko')">🇰🇷 한국어</div>
+            <div class="lang-option" data-lang="vi" onclick="switchLanguage('vi')">🇻🇳 Tiếng Việt</div>
+            <div class="lang-option" data-lang="hi" onclick="switchLanguage('hi')">🇮🇳 हिन्दी</div>
+        </div>
+    </div>
+
     <div class="container">
-        <h1 class="text-center my-5">语音合成v2.0</h1>
-        <p class="text-center text-muted mb-4">支持75种语言 · 322种音源 · 免费在线使用</p>
+        <h1 class="text-center my-5" data-i18n="title">语音合成v2.0</h1>
+        <p class="text-center text-muted mb-4" data-i18n="subtitle">支持75种语言 · 322种音源 · 免费在线使用</p>
         
         <form id="synthesize-form">
             <div class="mb-3">
-                <label for="text" class="form-label">请输入要转换为语音的文本:</label>
-                <textarea id="text" name="text" rows="4" class="form-control" placeholder="请输入文本..."></textarea>
+                <label for="text" class="form-label" data-i18n="input_label">请输入要转换为语音的文本:</label>
+                <textarea id="text" name="text" rows="4" class="form-control" data-i18n-placeholder="input_placeholder"></textarea>
             </div>
             
             <div class="mb-3">
-                <label class="form-label">选择语言:</label>
+                <label class="form-label" data-i18n="language_label">选择语言:</label>
                 <select id="language" class="form-select mb-2">
-                    <option value="">-- 请选择语言 --</option>
+                    <option value="" data-i18n="select_language">-- 请选择语言 --</option>
                 </select>
             </div>
             
             <div class="mb-3">
-                <label class="form-label">选择语音角色:</label>
+                <label class="form-label" data-i18n="voice_label">选择语音角色:</label>
                 <select id="voice" name="voice" class="form-select">
-                    <option value="">-- 请先选择语言 --</option>
+                    <option value="" data-i18n="select_voice">-- 请先选择语言 --</option>
                 </select>
             </div>
             
             <div class="mb-3">
-                <label for="rate" class="form-label">调整语速:</label>
+                <label for="rate" class="form-label" data-i18n="rate_label">调整语速:</label>
                 <select id="rate" name="rate" class="form-select">
                     <option value="-100%">-100</option>
                     <option value="-90%">-90</option>
@@ -155,7 +161,7 @@
                     <option value="-30%">-30</option>
                     <option value="-20%">-20</option>
                     <option value="-10%">-10</option>
-                    <option value="+0%" selected>正常</option>
+                    <option value="+0%" selected data-i18n="normal">正常</option>
                     <option value="+10%">+10</option>
                     <option value="+20%">+20</option>
                     <option value="+30%">+30</option>
@@ -170,11 +176,11 @@
             </div>
             
             <div class="text-center mb-3">
-                <button type="button" id="synthesize-button" class="btn btn-primary">合成音频</button>
+                <button type="button" id="synthesize-button" class="btn btn-primary" data-i18n="synthesize_btn">合成音频</button>
             </div>
             
             <div class="text-center mb-3">
-                <button type="button" id="play-button" class="btn btn-success" style="display:none;">试听</button>
+                <button type="button" id="play-button" class="btn btn-success" style="display:none;" data-i18n="play_btn">试听</button>
                 <div id="progress-container" class="progress mt-2" style="display:none; max-width: 200px; margin-left: auto; margin-right: auto;">
                     <div id="progress-bar" class="progress-bar progress-bar-striped" role="progressbar" style="width: 0%;" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
@@ -184,16 +190,202 @@
     </div>
     
     <footer style="text-align: center; padding: 20px 0; font-size: 14px; font-weight: 400; color: #777; margin-top: 100px; border-top: 1px solid #e6e6e6;">
-        &copy; 2023年4月22日 由 <a href="https://www.openai.com/" style="color: #333; text-decoration: none;">ChatGPT</a> 生成 · 支持75种语言
+        <span data-i18n="footer">&copy; 2023年4月22日 由 <a href="https://www.openai.com/" style="color: #333; text-decoration: none;">ChatGPT</a> 生成 · 支持75种语言</span>
     </footer>
     
     <script>
+        // 多语言翻译
+        const translations = {
+            zh: {
+                title: "语音合成v2.0",
+                subtitle: "支持75种语言 · 322种音源 · 免费在线使用",
+                input_label: "请输入要转换为语音的文本:",
+                input_placeholder: "请输入文本...",
+                language_label: "选择语言:",
+                voice_label: "选择语音角色:",
+                rate_label: "调整语速:",
+                select_language: "-- 请选择语言 --",
+                select_voice: "-- 请先选择语言 --",
+                normal: "正常",
+                synthesize_btn: "合成音频",
+                play_btn: "试听",
+                download_btn: "下载语音文件",
+                footer: "&copy; 2023年4月22日 由 <a href='https://www.openai.com/' style='color: #333; text-decoration: none;'>ChatGPT</a> 生成 · 支持75种语言",
+                alert_no_text: "请输入要转换为语音的文本！",
+                alert_no_voice: "请选择语音角色！",
+                alert_error: "合成失败，请稍后重试！错误：",
+                current_lang: "🇨🇳 中文"
+            },
+            en: {
+                title: "Text to Speech v2.0",
+                subtitle: "75 Languages · 322 Voices · Free Online",
+                input_label: "Enter text to convert to speech:",
+                input_placeholder: "Enter your text here...",
+                language_label: "Select Language:",
+                voice_label: "Select Voice:",
+                rate_label: "Adjust Speed:",
+                select_language: "-- Select Language --",
+                select_voice: "-- Please select language first --",
+                normal: "Normal",
+                synthesize_btn: "Synthesize",
+                play_btn: "Play",
+                download_btn: "Download Audio",
+                footer: "&copy; Apr 22, 2023 Powered by <a href='https://www.openai.com/' style='color: #333; text-decoration: none;'>ChatGPT</a> · 75 Languages Supported",
+                alert_no_text: "Please enter text to convert!",
+                alert_no_voice: "Please select a voice!",
+                alert_error: "Synthesis failed, please try again later! Error: ",
+                current_lang: "🇺🇸 English"
+            },
+            ja: {
+                title: "テキスト読み上げ v2.0",
+                subtitle: "75言語 · 322音声 · 無料オンライン",
+                input_label: "音声に変換するテキストを入力:",
+                input_placeholder: "テキストを入力...",
+                language_label: "言語を選択:",
+                voice_label: "音声を選択:",
+                rate_label: "速度を調整:",
+                select_language: "-- 言語を選択 --",
+                select_voice: "-- 先に言語を選択 --",
+                normal: "標準",
+                synthesize_btn: "音声合成",
+                play_btn: "再生",
+                download_btn: "音声をダウンロード",
+                footer: "&copy; 2023年4月22日 <a href='https://www.openai.com/' style='color: #333; text-decoration: none;'>ChatGPT</a> 提供 · 75言語対応",
+                alert_no_text: "音声に変換するテキストを入力してください！",
+                alert_no_voice: "音声を選択してください！",
+                alert_error: "合成に失敗しました。後でもう一度お試しください！エラー: ",
+                current_lang: "🇯🇵 日本語"
+            },
+            ko: {
+                title: "텍스트 음성 변환 v2.0",
+                subtitle: "75개 언어 · 322개 음성 · 무료 온라인",
+                input_label: "음성으로 변환할 텍스트 입력:",
+                input_placeholder: "텍스트를 입력하세요...",
+                language_label: "언어 선택:",
+                voice_label: "음성 선택:",
+                rate_label: "속도 조절:",
+                select_language: "-- 언어 선택 --",
+                select_voice: "-- 먼저 언어를 선택하세요 --",
+                normal: "표준",
+                synthesize_btn: "음성 합성",
+                play_btn: "재생",
+                download_btn: "음성 다운로드",
+                footer: "&copy; 2023년 4월 22일 <a href='https://www.openai.com/' style='color: #333; text-decoration: none;'>ChatGPT</a> 제공 · 75개 언어 지원",
+                alert_no_text: "음성으로 변환할 텍스트를 입력하세요!",
+                alert_no_voice: "음성을 선택하세요!",
+                alert_error: "합성에 실패했습니다. 나중에 다시 시도하세요! 오류: ",
+                current_lang: "🇰🇷 한국어"
+            },
+            vi: {
+                title: "Chuyển văn bản thành giọng nói v2.0",
+                subtitle: "75 ngôn ngữ · 322 giọng · Miễn phí",
+                input_label: "Nhập văn bản để chuyển thành giọng nói:",
+                input_placeholder: "Nhập văn bản...",
+                language_label: "Chọn ngôn ngữ:",
+                voice_label: "Chọn giọng:",
+                rate_label: "Điều chỉnh tốc độ:",
+                select_language: "-- Chọn ngôn ngữ --",
+                select_voice: "-- Vui lòng chọn ngôn ngữ trước --",
+                normal: "Bình thường",
+                synthesize_btn: "Tổng hợp",
+                play_btn: "Phát",
+                download_btn: "Tải xuống âm thanh",
+                footer: "&copy; 22 tháng 4 năm 2023 <a href='https://www.openai.com/' style='color: #333; text-decoration: none;'>ChatGPT</a> · Hỗ trợ 75 ngôn ngữ",
+                alert_no_text: "Vui lòng nhập văn bản để chuyển đổi!",
+                alert_no_voice: "Vui lòng chọn giọng nói!",
+                alert_error: "Tổng hợp thất bại, vui lòng thử lại sau! Lỗi: ",
+                current_lang: "🇻🇳 Tiếng Việt"
+            },
+            hi: {
+                title: "टेक्स्ट टू स्पीच v2.0",
+                subtitle: "75 भाषाएं · 322 आवाजें · मुफ्त ऑनलाइन",
+                input_label: "आवाज में बदलने के लिए टेक्स्ट दर्ज करें:",
+                input_placeholder: "टेक्स्ट दर्ज करें...",
+                language_label: "भाषा चुनें:",
+                voice_label: "आवाज चुनें:",
+                rate_label: "गति समायोजित करें:",
+                select_language: "-- भाषा चुनें --",
+                select_voice: "-- कृपया पहले भाषा चुनें --",
+                normal: "सामान्य",
+                synthesize_btn: "संश्लेषण",
+                play_btn: "चलाएं",
+                download_btn: "ऑडियो डाउनलोड करें",
+                footer: "&copy; 22 अप्रैल 2023 <a href='https://www.openai.com/' style='color: #333; text-decoration: none;'>ChatGPT</a> · 75 भाषाएं समर्थित",
+                alert_no_text: "कृपया आवाज में बदलने के लिए टेक्स्ट दर्ज करें!",
+                alert_no_voice: "कृपया आवाज चुनें!",
+                alert_error: "संश्लेषण विफल, कृपया बाद में पुनः प्रयास करें! त्रुटि: ",
+                current_lang: "🇮🇳 हिन्दी"
+            }
+        };
+
+        let currentLang = localStorage.getItem('tts-lang') || 'zh';
+
+        // 切换语言下拉菜单
+        function toggleLangDropdown() {
+            document.getElementById('lang-dropdown').classList.toggle('show');
+        }
+
+        // 切换语言
+        function switchLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('tts-lang', lang);
+            updateUI();
+            document.getElementById('lang-dropdown').classList.remove('show');
+        }
+
+        // 更新界面
+        function updateUI() {
+            const t = translations[currentLang];
+            
+            // 更新文本
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key]) {
+                    el.innerHTML = t[key];
+                }
+            });
+
+            // 更新placeholder
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (t[key]) {
+                    el.placeholder = t[key];
+                }
+            });
+
+            // 更新当前语言显示
+            document.getElementById('current-lang').textContent = t.current_lang;
+
+            // 更新下拉菜单选中状态
+            document.querySelectorAll('.lang-option').forEach(el => {
+                el.classList.remove('active');
+                if (el.getAttribute('data-lang') === currentLang) {
+                    el.classList.add('active');
+                }
+            });
+
+            // 更新按钮文本
+            document.getElementById('synthesize-button').textContent = t.synthesize_btn;
+            const playBtn = document.getElementById('play-button');
+            if (!isPlaying) {
+                playBtn.textContent = t.play_btn;
+            }
+        }
+
+        // 点击外部关闭下拉菜单
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.lang-switcher')) {
+                document.getElementById('lang-dropdown').classList.remove('show');
+            }
+        });
+
         var audio;
         var isPlaying = false;
         var voicesData = {};
         
-        // 页面加载时获取语音列表
+        // 页面加载时初始化
         $(document).ready(function() {
+            updateUI();
             loadVoices();
         });
         
@@ -208,14 +400,12 @@
                     }
                 },
                 error: function() {
-                    // 如果API获取失败，使用默认语音列表
                     loadDefaultVoices();
                 }
             });
         }
         
         function loadDefaultVoices() {
-            // 默认中文语音列表
             var defaultVoices = {
                 "中文": {
                     "zh-CN": [
@@ -247,12 +437,9 @@
         function populateLanguages() {
             var $langSelect = $("#language");
             $langSelect.empty();
-            $langSelect.append('<option value="">-- 请选择语言 --</option>');
+            $langSelect.append(`<option value="">${translations[currentLang].select_language}</option>`);
             
-            // 按字母顺序排序语言
             var sortedLanguages = Object.keys(voicesData).sort();
-            
-            // 将中文放在最前面
             if (sortedLanguages.includes("中文")) {
                 sortedLanguages = ["中文"].concat(sortedLanguages.filter(l => l !== "中文"));
             }
@@ -262,14 +449,14 @@
                 $.each(voicesData[lang], function(region, voices) {
                     voiceCount += voices.length;
                 });
-                $langSelect.append(`<option value="${lang}">${lang} (${voiceCount}个音源)</option>`);
+                $langSelect.append(`<option value="${lang}">${lang} (${voiceCount})</option>`);
             });
         }
         
         function populateVoices(language) {
             var $voiceSelect = $("#voice");
             $voiceSelect.empty();
-            $voiceSelect.append('<option value="">-- 请选择语音角色 --</option>');
+            $voiceSelect.append(`<option value="">${translations[currentLang].select_voice}</option>`);
             
             if (!language || !voicesData[language]) {
                 return;
@@ -280,14 +467,12 @@
                 var $optgroup = $(`<optgroup label="${region}"></optgroup>`);
                 $.each(voices, function(index, voice) {
                     var genderClass = voice.gender === "男" ? "male" : "female";
-                    var genderText = voice.gender === "男" ? "男" : "女";
-                    $optgroup.append(`<option value="${voice.name}">${voice.display_name} <span class="voice-tag ${genderClass}">${genderText}</span></option>`);
+                    $optgroup.append(`<option value="${voice.name}">${voice.display_name} <span class="voice-tag ${genderClass}">${voice.gender}</span></option>`);
                 });
                 $voiceSelect.append($optgroup);
             });
         }
         
-        // 语言选择变化时更新语音列表
         $("#language").on("change", function() {
             var selectedLang = $(this).val();
             populateVoices(selectedLang);
@@ -296,31 +481,33 @@
         $("#synthesize-button").on("click", function(event) {
             var text = $("#text").val().trim();
             var voice = $("#voice").val();
+            var t = translations[currentLang];
             
             if (!text) {
-                alert("请输入要转换为语音的文本！");
+                alert(t.alert_no_text);
                 return;
             }
             if (!voice) {
-                alert("请选择语音角色！");
+                alert(t.alert_no_voice);
                 return;
             }
             
-            $(this).prop("disabled", true).text("生成中...");
+            $(this).prop("disabled", true).text("...");
             requestSynthesis();
         });
         
         $("#play-button").on("click", function(event) {
+            var t = translations[currentLang];
             if (isPlaying) {
                 audio.pause();
                 audio.currentTime = 0;
                 isPlaying = false;
-                $("#play-button").text("试听");
+                $("#play-button").text(t.play_btn);
                 $("#progress-container").slideUp();
             } else {
                 audio.play();
                 isPlaying = true;
-                $("#play-button").text("停止");
+                $("#play-button").text("Stop");
                 $("#progress-container").slideDown();
 
                 audio.addEventListener("timeupdate", function () {
@@ -330,7 +517,7 @@
 
                 audio.addEventListener("ended", function () {
                     isPlaying = false;
-                    $("#play-button").text("试听");
+                    $("#play-button").text(t.play_btn);
                     $("#progress-container").slideUp();
                     $("#progress-bar").css("width", 0 + "%").attr("aria-valuenow", 0);
                 });
@@ -338,6 +525,7 @@
         });
 
         function requestSynthesis() {
+            var t = translations[currentLang];
             var form_data = {
                 'text': $("#text").val(),
                 'voice': $("#voice").val(),
@@ -351,19 +539,19 @@
                 data: JSON.stringify(form_data),
                 success: function(response){
                     var download_link = response['download_link'];
-                    $("#download-link").html(`<a href="${download_link}" class="btn btn-success" download>下载语音文件</a>`).show();
+                    $("#download-link").html(`<a href="${download_link}" class="btn btn-success" download>${t.download_btn}</a>`).show();
                     audio = new Audio(download_link);
                     isPlaying = false;
-                    $("#synthesize-button").prop("disabled", false).text("合成音频");
-                    $("#play-button").show().text("试听");
+                    $("#synthesize-button").prop("disabled", false).text(t.synthesize_btn);
+                    $("#play-button").show().text(t.play_btn);
                     audio.addEventListener("ended", function () {
                         isPlaying = false;
-                        $("#play-button").text("试听");
+                        $("#play-button").text(t.play_btn);
                     });
                 },
                 error: function(xhr, status, error) {
-                    alert("合成失败，请稍后重试！错误：" + error);
-                    $("#synthesize-button").prop("disabled", false).text("合成音频");
+                    alert(t.alert_error + error);
+                    $("#synthesize-button").prop("disabled", false).text(t.synthesize_btn);
                 }
             });
         }
