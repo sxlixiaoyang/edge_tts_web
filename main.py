@@ -260,4 +260,30 @@ async def download(filename: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    import sys
+    
+    print("=" * 50)
+    print("  Edge TTS Web 服务启动中...")
+    print("=" * 50)
+    print()
+    print("  启动成功后，请在浏览器中访问：")
+    print("  http://localhost:8000")
+    print()
+    print("  按 Ctrl+C 停止服务")
+    print("=" * 50)
+    print()
+    
+    try:
+        uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False)
+    except KeyboardInterrupt:
+        print()
+        print("服务已停止")
+    except Exception as e:
+        print()
+        print("=" * 50)
+        print("  启动失败！错误信息：")
+        print(f"  {e}")
+        print("=" * 50)
+        print()
+        input("按回车键退出...")
+        sys.exit(1)
