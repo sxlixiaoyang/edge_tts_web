@@ -1,0 +1,158 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux
+            arch: x64
+            ext: ''
+          - os: windows-latest
+            target: windows
+            arch: x64
+            ext: '.exe'
+          - os: macos-latest
+            target: macos
+            arch: x64
+            ext: ''
+          - os: macos-latest
+            target: macos
+            arch: arm64
+            ext: ''
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Build with PyInstaller (Windows)
+      if: matrix.target == 'windows'
+      run: |
+        pyinstaller --onefile --name edge_tts_web_${{ matrix.target }}_${{ matrix.arch }}${{ matrix.ext }} main.py
+
+    - name: Build with PyInstaller (Linux/macOS)
+      if: matrix.target != 'windows'
+      run: |
+        pyinstaller --onefile --name edge_tts_web_${{ matrix.target }}_${{ matrix.arch }} main.py
+
+    - name: Package application (Windows)
+      if: matrix.target == 'windows'
+      run: |
+        mkdir -p release_package
+        cp dist/edge_tts_web_${{ matrix.target }}_${{ matrix.arch }}${{ matrix.ext }} release_package/
+        cp -r templates release_package/
+        cp -r mp3 release_package/
+        cp voices.json release_package/
+        cp requirements.txt release_package/
+        cp README.md release_package/
+        cd release_package
+        7z a ../edge_tts_web_${{ matrix.target }}_${{ matrix.arch }}.zip *
+
+    - name: Package application (Linux/macOS)
+      if: matrix.target != 'windows'
+      run: |
+        mkdir -p release_package
+        cp dist/edge_tts_web_${{ matrix.target }}_${{ matrix.arch }} release_package/
+        cp -r templates release_package/
+        cp -r mp3 release_package/
+        cp voices.json release_package/
+        cp requirements.txt release_package/
+        cp README.md release_package/
+        cd release_package
+        tar -czf ../edge_tts_web_${{ matrix.target }}_${{ matrix.arch }}.tar.gz *
+
+    - name: Upload artifact (Windows)
+      if: matrix.target == 'windows'
+      uses: actions/upload-artifact@v4
+      with:
+        name: edge_tts_web_${{ matrix.target }}_${{ matrix.arch }}
+        path: edge_tts_web_${{ matrix.target }}_${{ matrix.arch }}.zip
+
+    - name: Upload artifact (Linux/macOS)
+      if: matrix.target != 'windows'
+      uses: actions/upload-artifact@v4
+      with:
+        name: edge_tts_web_${{ matrix.target }}_${{ matrix.arch }}
+        path: edge_tts_web_${{ matrix.target }}_${{ matrix.arch }}.tar.gz
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+        merge-multiple: true
+
+    - name: List artifacts
+      run: ls -la artifacts/
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+      with:
+        files: artifacts/*
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+        tag_name: ${{ github.event.inputs.version || github.ref_name }}
+        name: Release ${{ github.event.inputs.version || github.ref_name }}
+        body: |
+          ## Edge TTS Web ${{ github.event.inputs.version || github.ref_name }}
+
+          ### 下载说明
+          请根据您的操作系统选择对应的版本：
+
+          - **Windows (x64)**: `edge_tts_web_windows_x64.zip`
+          - **Linux (x64)**: `edge_tts_web_linux_x64.tar.gz`
+          - **macOS (Intel/x64)**: `edge_tts_web_macos_x64.tar.gz`
+          - **macOS (Apple Silicon/ARM64)**: `edge_tts_web_macos_arm64.tar.gz`
+
+          ### 使用方法
+
+          1. 下载对应平台的压缩包
+          2. 解压到任意目录
+          3. 运行可执行文件：
+             - Windows: 双击 `edge_tts_web_windows_x64.exe`
+             - Linux/macOS: `./edge_tts_web_linux_x64` 或 `./edge_tts_web_macos_x64`
+          4. 打开浏览器访问 `http://localhost:8000`
+
+          ### 功能特性
+          - 🌍 支持75种语言
+          - 🎙️ 322+种音源
+          - 🚀 完全免费，无需API密钥
+          - 🎨 多语言界面
+          - ⚡ 语速调节
+          - 🎧 在线试听
+          - 📥 下载功能
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
