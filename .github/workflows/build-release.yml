@@ -13,26 +13,46 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
-            target: linux
-            arch: x64
-            ext: ''
-          - os: windows-latest
+          # Windows x64
+          - runner: windows-latest
             target: windows
             arch: x64
             ext: '.exe'
-          - os: macos-latest
+            python-arch: 'x64'
+          # Windows x86 (32-bit)
+          - runner: windows-latest
+            target: windows
+            arch: x86
+            ext: '.exe'
+            python-arch: 'x86'
+          # Linux x64
+          - runner: ubuntu-latest
+            target: linux
+            arch: x64
+            ext: ''
+            python-arch: 'x64'
+          # Linux ARM64
+          - runner: ubuntu-24.04-arm
+            target: linux
+            arch: arm64
+            ext: ''
+            python-arch: 'x64'
+          # macOS x64 (Intel)
+          - runner: macos-13
             target: macos
             arch: x64
             ext: ''
-          - os: macos-latest
+            python-arch: 'x64'
+          # macOS ARM64 (Apple Silicon)
+          - runner: macos-latest
             target: macos
             arch: arm64
             ext: ''
+            python-arch: 'x64'
 
     steps:
     - uses: actions/checkout@v4
@@ -41,6 +61,7 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
+        architecture: ${{ matrix.python-arch }}
 
     - name: Install dependencies
       run: |
@@ -61,15 +82,16 @@ jobs:
     - name: Package application (Windows)
       if: matrix.target == 'windows'
       run: |
-        mkdir -p release_package
-        cp dist/edge_tts_web_${{ matrix.target }}_${{ matrix.arch }}${{ matrix.ext }} release_package/
-        cp -r templates release_package/
-        cp -r mp3 release_package/
-        cp voices.json release_package/
-        cp requirements.txt release_package/
-        cp README.md release_package/
+        mkdir release_package
+        copy dist\edge_tts_web_${{ matrix.target }}_${{ matrix.arch }}${{ matrix.ext }} release_package\
+        xcopy templates release_package\templates\ /E /I
+        xcopy mp3 release_package\mp3\ /E /I
+        copy voices.json release_package\
+        copy requirements.txt release_package\
+        copy README.md release_package\
         cd release_package
-        7z a ../edge_tts_web_${{ matrix.target }}_${{ matrix.arch }}.zip *
+        7z a ..\edge_tts_web_${{ matrix.target }}_${{ matrix.arch }}.zip *
+      shell: cmd
 
     - name: Package application (Linux/macOS)
       if: matrix.target != 'windows'
@@ -128,24 +150,28 @@ jobs:
         name: Release ${{ github.event.inputs.version || github.ref_name }}
         body: |
           ## Edge TTS Web ${{ github.event.inputs.version || github.ref_name }}
-
+          
           ### 下载说明
           请根据您的操作系统选择对应的版本：
-
-          - **Windows (x64)**: `edge_tts_web_windows_x64.zip`
-          - **Linux (x64)**: `edge_tts_web_linux_x64.tar.gz`
-          - **macOS (Intel/x64)**: `edge_tts_web_macos_x64.tar.gz`
-          - **macOS (Apple Silicon/ARM64)**: `edge_tts_web_macos_arm64.tar.gz`
-
+          
+          #### Windows
+          - **Windows x64 (64位)**: `edge_tts_web_windows_x64.zip` - 推荐，适用于大多数现代 Windows 系统
+          - **Windows x86 (32位)**: `edge_tts_web_windows_x86.zip` - 适用于老旧 32 位系统
+          
+          #### Linux
+          - **Linux x64 (64位)**: `edge_tts_web_linux_x64.tar.gz` - 适用于标准 PC/服务器
+          - **Linux ARM64**: `edge_tts_web_linux_arm64.tar.gz` - 适用于树莓派、ARM 服务器
+          
+          #### macOS
+          - **macOS x64 (Intel)**: `edge_tts_web_macos_x64.tar.gz` - 适用于 Intel 芯片 Mac（2019年及之前）
+          - **macOS ARM64 (Apple Silicon)**: `edge_tts_web_macos_arm64.tar.gz` - 适用于 M1/M2/M3/M4 芯片 Mac
+          
           ### 使用方法
-
           1. 下载对应平台的压缩包
           2. 解压到任意目录
-          3. 运行可执行文件：
-             - Windows: 双击 `edge_tts_web_windows_x64.exe`
-             - Linux/macOS: `./edge_tts_web_linux_x64` 或 `./edge_tts_web_macos_x64`
+          3. 运行可执行文件
           4. 打开浏览器访问 `http://localhost:8000`
-
+          
           ### 功能特性
           - 🌍 支持75种语言
           - 🎙️ 322+种音源
