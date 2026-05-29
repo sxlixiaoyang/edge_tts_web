@@ -15,6 +15,7 @@ jobs:
   build:
     runs-on: ${{ matrix.runner }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           # Windows x64
@@ -22,37 +23,31 @@ jobs:
             target: windows
             arch: x64
             ext: '.exe'
-            python-arch: 'x64'
-          # Windows x86 (32-bit)
+          # Windows x86 (32-bit) - 使用 Python 3.10
           - runner: windows-latest
             target: windows
             arch: x86
             ext: '.exe'
-            python-arch: 'x86'
           # Linux x64
           - runner: ubuntu-latest
             target: linux
             arch: x64
             ext: ''
-            python-arch: 'x64'
-          # Linux ARM64
-          - runner: ubuntu-24.04-arm
+          # Linux ARM64 - 使用 ubuntu-22.04
+          - runner: ubuntu-22.04
             target: linux
             arch: arm64
             ext: ''
-            python-arch: 'x64'
           # macOS x64 (Intel)
           - runner: macos-13
             target: macos
             arch: x64
             ext: ''
-            python-arch: 'x64'
           # macOS ARM64 (Apple Silicon)
           - runner: macos-latest
             target: macos
             arch: arm64
             ext: ''
-            python-arch: 'x64'
 
     steps:
     - uses: actions/checkout@v4
@@ -61,7 +56,6 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-        architecture: ${{ matrix.python-arch }}
 
     - name: Install dependencies
       run: |
