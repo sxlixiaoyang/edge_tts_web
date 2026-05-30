@@ -170,52 +170,36 @@
             </div>
             
             <div class="mb-3">
-                <label class="form-label" data-i18n="style_label">语音风格:</label>
-                <select id="style" name="style" class="form-select">
-                    <option value="general" data-i18n="style_general">普通</option>
-                    <option value="assistant" data-i18n="style_assistant">助手</option>
-                    <option value="chat" data-i18n="style_chat">聊天</option>
-                    <option value="customerservice" data-i18n="style_customerservice">客服</option>
-                    <option value="newscast" data-i18n="style_newscast">新闻播报</option>
-                    <option value="affectionate" data-i18n="style_affectionate">亲切</option>
-                    <option value="angry" data-i18n="style_angry">愤怒</option>
-                    <option value="cheerful" data-i18n="style_cheerful">愉快</option>
-                    <option value="sad" data-i18n="style_sad">悲伤</option>
-                    <option value="excited" data-i18n="style_excited">兴奋</option>
-                    <option value="friendly" data-i18n="style_friendly">友好</option>
-                    <option value="terrified" data-i18n="style_terrified">恐惧</option>
-                    <option value="shouting" data-i18n="style_shouting">喊叫</option>
-                    <option value="whispering" data-i18n="style_whispering">耳语</option>
-                    <option value="hopeful" data-i18n="style_hopeful">充满希望</option>
-                    <option value="empathetic" data-i18n="style_empathetic">共情</option>
-                    <option value="lyrical" data-i18n="style_lyrical">抒情</option>
+                <label for="rate" class="form-label" data-i18n="rate_label">调整语速:</label>
+                <select id="rate" name="rate" class="form-select">
+                    <option value="-50%">-50%</option>
+                    <option value="-40%">-40%</option>
+                    <option value="-30%">-30%</option>
+                    <option value="-20%">-20%</option>
+                    <option value="-10%">-10%</option>
+                    <option value="+0%" selected data-i18n="normal">正常</option>
+                    <option value="+10%">+10%</option>
+                    <option value="+20%">+20%</option>
+                    <option value="+30%">+30%</option>
+                    <option value="+40%">+40%</option>
+                    <option value="+50%">+50%</option>
                 </select>
             </div>
             
             <div class="mb-3">
-                <label for="rate" class="form-label" data-i18n="rate_label">调整语速:</label>
-                <select id="rate" name="rate" class="form-select">
-                    <option value="-100%">-100</option>
-                    <option value="-90%">-90</option>
-                    <option value="-80%">-80</option>
-                    <option value="-70%">-70</option>
-                    <option value="-60%">-60</option>
-                    <option value="-50%">-50</option>
-                    <option value="-40%">-40</option>
-                    <option value="-30%">-30</option>
-                    <option value="-20%">-20</option>
-                    <option value="-10%">-10</option>
-                    <option value="+0%" selected data-i18n="normal">正常</option>
-                    <option value="+10%">+10</option>
-                    <option value="+20%">+20</option>
-                    <option value="+30%">+30</option>
-                    <option value="+40%">+40</option>
-                    <option value="+50%">+50</option>
-                    <option value="+60%">+60</option>
-                    <option value="+70%">+70</option>
-                    <option value="+80%">+80</option>
-                    <option value="+90%">+90</option>
-                    <option value="+100%">+100</option>
+                <label for="pitch" class="form-label" data-i18n="pitch_label">调整音调:</label>
+                <select id="pitch" name="pitch" class="form-select">
+                    <option value="-50Hz">-50Hz</option>
+                    <option value="-40Hz">-40Hz</option>
+                    <option value="-30Hz">-30Hz</option>
+                    <option value="-20Hz">-20Hz</option>
+                    <option value="-10Hz">-10Hz</option>
+                    <option value="+0Hz" selected data-i18n="normal">正常</option>
+                    <option value="+10Hz">+10Hz</option>
+                    <option value="+20Hz">+20Hz</option>
+                    <option value="+30Hz">+30Hz</option>
+                    <option value="+40Hz">+40Hz</option>
+                    <option value="+50Hz">+50Hz</option>
                 </select>
             </div>
             
@@ -242,13 +226,13 @@
         const translations = {
             zh: {
                 title: "语音合成v2.0",
-                subtitle: "支持75种语言 · 322种音源 · 17种语音风格 · 免费在线使用",
+                subtitle: "支持75种语言 · 322种音源 · 免费在线使用",
                 input_label: "请输入要转换为语音的文本:",
                 input_placeholder: "请输入文本...",
                 language_label: "选择语言:",
                 voice_label: "选择语音角色:",
-                style_label: "语音风格:",
                 rate_label: "调整语速:",
+                pitch_label: "调整音调:",
                 select_language: "-- 请选择语言 --",
                 select_voice: "-- 请先选择语言 --",
                 normal: "正常",
@@ -260,34 +244,17 @@
                 alert_no_voice: "请选择语音角色！",
                 alert_error: "合成失败，请稍后重试！错误：",
                 current_lang: "🇨🇳 中文",
-                api_nav: "<i class='fas fa-code'></i> API",
-                style_general: "普通",
-                style_assistant: "助手",
-                style_chat: "聊天",
-                style_customerservice: "客服",
-                style_newscast: "新闻播报",
-                style_affectionate: "亲切",
-                style_angry: "愤怒",
-                style_cheerful: "愉快",
-                style_sad: "悲伤",
-                style_excited: "兴奋",
-                style_friendly: "友好",
-                style_terrified: "恐惧",
-                style_shouting: "喊叫",
-                style_whispering: "耳语",
-                style_hopeful: "充满希望",
-                style_empathetic: "共情",
-                style_lyrical: "抒情"
+                api_nav: "<i class='fas fa-code'></i> API"
             },
             en: {
                 title: "Text to Speech v2.0",
-                subtitle: "75 Languages · 322 Voices · 17 Styles · Free Online",
+                subtitle: "75 Languages · 322 Voices · Free Online",
                 input_label: "Enter text to convert to speech:",
                 input_placeholder: "Enter your text here...",
                 language_label: "Select Language:",
                 voice_label: "Select Voice:",
-                style_label: "Voice Style:",
                 rate_label: "Adjust Speed:",
+                pitch_label: "Adjust Pitch:",
                 select_language: "-- Select Language --",
                 select_voice: "-- Please select language first --",
                 normal: "Normal",
@@ -299,24 +266,7 @@
                 alert_no_voice: "Please select a voice!",
                 alert_error: "Synthesis failed, please try again later! Error: ",
                 current_lang: "🇺🇸 English",
-                api_nav: "<i class='fas fa-code'></i> API",
-                style_general: "General",
-                style_assistant: "Assistant",
-                style_chat: "Chat",
-                style_customerservice: "Customer Service",
-                style_newscast: "Newscast",
-                style_affectionate: "Affectionate",
-                style_angry: "Angry",
-                style_cheerful: "Cheerful",
-                style_sad: "Sad",
-                style_excited: "Excited",
-                style_friendly: "Friendly",
-                style_terrified: "Terrified",
-                style_shouting: "Shouting",
-                style_whispering: "Whispering",
-                style_hopeful: "Hopeful",
-                style_empathetic: "Empathetic",
-                style_lyrical: "Lyrical"
+                api_nav: "<i class='fas fa-code'></i> API"
             },
             ja: {
                 title: "テキスト読み上げ v2.0",
@@ -774,7 +724,7 @@
                 'text': $("#text").val(),
                 'voice': $("#voice").val(),
                 'rate': $("#rate").val(),
-                'style': $("#style").val()
+                'pitch': $("#pitch").val()
             };
             
             $.ajax({

@@ -202,46 +202,11 @@ async def get_voices():
     return result
 
 
-# 语音风格映射
-VOICE_STYLES = {
-    "general": "普通",
-    "assistant": "助手",
-    "chat": "聊天",
-    "customerservice": "客服",
-    "newscast": "新闻播报",
-    "affectionate": "亲切",
-    "angry": "愤怒",
-    "cheerful": "愉快",
-    "sad": "悲伤",
-    "excited": "兴奋",
-    "friendly": "友好",
-    "terrified": "恐惧",
-    "shouting": "喊叫",
-    "whispering": "耳语",
-    "hopeful": "充满希望",
-    "empathetic": "共情",
-    "lyrical": "抒情"
-}
-
-async def my_function(text, output, voice, rate, style="general"):
+async def my_function(text, output, voice, rate, pitch="+0Hz"):
     volume = '+0%'
     try:
-        logger.info(f"开始合成语音: voice={voice}, rate={rate}, style={style}, text_length={len(text)}")
-        
-        # 构建 SSML 以支持语音风格
-        if style and style != "general":
-            # 使用 SSML 添加语音风格
-            ssml_text = f"""<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="zh-CN">
-                <voice name="{voice}">
-                    <mstts:express-as style="{style}">
-                        {text}
-                    </mstts:express-as>
-                </voice>
-            </speak>"""
-            tts = edge_tts.Communicate(ssml_text, voice=voice, rate=rate, volume=volume)
-        else:
-            tts = edge_tts.Communicate(text=text, voice=voice, rate=rate, volume=volume)
-        
+        logger.info(f"开始合成语音: voice={voice}, rate={rate}, pitch={pitch}, text_length={len(text)}")
+        tts = edge_tts.Communicate(text=text, voice=voice, rate=rate, volume=volume, pitch=pitch)
         await tts.save(output)
         logger.info(f"语音合成成功: {output}")
         return True
@@ -271,7 +236,7 @@ async def get_voices_api():
     """API: 获取所有支持的语音列表"""
     try:
         voices = await get_voices()
-        return JSONResponse(content={"message": "success", "voices": voices, "styles": VOICE_STYLES})
+        return JSONResponse(content={"message": "success", "voices": voices})
     except Exception as e:
         return JSONResponse(
             content={"message": "error", "error": str(e)},
@@ -286,9 +251,9 @@ async def synthesize(request: Request):
         text = data.get("text", "").strip()
         voice = data.get("voice", "zh-CN-XiaoxiaoNeural")
         rate = data.get("rate", "+0%")
-        style = data.get("style", "general")
+        pitch = data.get("pitch", "+0Hz")
         
-        logger.info(f"收到合成请求: voice={voice}, rate={rate}, style={style}")
+        logger.info(f"收到合成请求: voice={voice}, rate={rate}, pitch={pitch}")
         
         if not text:
             logger.warning("文本为空，拒绝请求")
@@ -308,7 +273,7 @@ async def synthesize(request: Request):
             temp_filename = temp_file.name
         
         # 生成语音
-        success = await my_function(text, temp_filename, voice, rate, style)
+        success = await my_function(text, temp_filename, voice, rate, pitch)
         
         if not success:
             if os.path.exists(temp_filename):
