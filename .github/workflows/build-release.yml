@@ -61,12 +61,12 @@ jobs:
     - name: Build with PyInstaller (Windows)
       if: matrix.target == 'windows'
       run: |
-        pyinstaller --onefile --name edge_tts_web_${{ matrix.target }}_${{ matrix.arch }}${{ matrix.ext }} main.py
+        pyinstaller --onefile --name edge_tts_web_${{ matrix.target }}_${{ matrix.arch }}${{ matrix.ext }} --add-data "templates;templates" --add-data "mp3;mp3" --add-data "voices.json;." main.py
 
     - name: Build with PyInstaller (Linux/macOS)
       if: matrix.target != 'windows'
       run: |
-        pyinstaller --onefile --name edge_tts_web_${{ matrix.target }}_${{ matrix.arch }} main.py
+        pyinstaller --onefile --name edge_tts_web_${{ matrix.target }}_${{ matrix.arch }} --add-data "templates:templates" --add-data "mp3:mp3" --add-data "voices.json:." main.py
 
     - name: Package application (Windows)
       if: matrix.target == 'windows'
