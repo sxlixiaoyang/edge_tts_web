@@ -13,10 +13,20 @@ import traceback
 import sys
 
 # ============ 日志配置 ============
+def get_app_dir():
+    """获取程序所在目录（兼容 PyInstaller 打包）"""
+    import sys
+    if getattr(sys, 'frozen', False):
+        # PyInstaller 打包后的路径
+        return os.path.dirname(sys.executable)
+    else:
+        # 普通 Python 脚本路径
+        return os.path.dirname(os.path.abspath(__file__))
+
 def setup_logging():
     """设置日志记录"""
     # 获取程序所在目录
-    app_dir = os.path.dirname(os.path.abspath(__file__))
+    app_dir = get_app_dir()
     log_dir = os.path.join(app_dir, "logs")
     
     # 创建日志目录
@@ -40,23 +50,36 @@ def setup_logging():
         ]
     )
     
-    return logging.getLogger(__name__), log_file
+    return logging.getLogger(__name__), log_file, app_dir
 
 # 初始化日志
-logger, LOG_FILE = setup_logging()
+logger, LOG_FILE, APP_DIR = setup_logging()
 logger.info("=" * 50)
 logger.info("Edge TTS Web 服务初始化")
 logger.info(f"日志文件: {LOG_FILE}")
+logger.info(f"程序目录: {APP_DIR}")
 logger.info("=" * 50)
 
 app = FastAPI()
 
+# 获取资源目录（兼容 PyInstaller 打包）
+def get_resource_path(relative_path):
+    """获取资源文件路径（兼容 PyInstaller 打包）"""
+    import sys
+    if getattr(sys, 'frozen', False):
+        # PyInstaller 打包后，资源文件在临时目录
+        base_path = sys._MEIPASS
+    else:
+        # 普通 Python 脚本
+        base_path = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(base_path, relative_path)
+
 # 创建模板目录路径
-templates_dir = os.path.join(os.path.dirname(__file__), "templates")
+templates_dir = get_resource_path("templates")
 templates = Jinja2Templates(directory=templates_dir)
 
-# 创建mp3目录
-output_dir = os.path.join(os.path.dirname(__file__), "mp3")
+# 创建mp3目录（放在exe所在目录，而不是临时目录）
+output_dir = os.path.join(APP_DIR, "mp3")
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
@@ -324,10 +347,12 @@ if __name__ == "__main__":
     logger.info("服务启动中...")
     logger.info(f"Python版本: {sys.version}")
     logger.info(f"工作目录: {os.getcwd()}")
-    logger.info(f"程序目录: {os.path.dirname(os.path.abspath(__file__))}")
+    logger.info(f"程序目录: {APP_DIR}")
     
     try:
-        uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False)
+        # 直接传递 app 对象，而不是字符串引用
+        # 这样在 PyInstaller 打包后也能正常工作
+        uvicorn.run(app, host="0.0.0.0", port=8000)
     except KeyboardInterrupt:
         logger.info("用户中断，服务停止")
         print()
