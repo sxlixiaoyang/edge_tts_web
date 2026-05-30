@@ -38,11 +38,6 @@ jobs:
             target: linux
             arch: arm64
             ext: ''
-          # macOS x64 (Intel)
-          - runner: macos-13
-            target: macos
-            arch: x64
-            ext: ''
           # macOS ARM64 (Apple Silicon)
           - runner: macos-latest
             target: macos
@@ -157,7 +152,6 @@ jobs:
           - **Linux ARM64**: `edge_tts_web_linux_arm64.tar.gz` - 适用于树莓派、ARM 服务器
           
           #### macOS
-          - **macOS x64 (Intel)**: `edge_tts_web_macos_x64.tar.gz` - 适用于 Intel 芯片 Mac（2019年及之前）
           - **macOS ARM64 (Apple Silicon)**: `edge_tts_web_macos_arm64.tar.gz` - 适用于 M1/M2/M3/M4 芯片 Mac
           
           ### 使用方法
