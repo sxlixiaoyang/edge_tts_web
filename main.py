@@ -8,6 +8,46 @@ import datetime
 import os
 import tempfile
 import asyncio
+import logging
+import traceback
+import sys
+
+# ============ 日志配置 ============
+def setup_logging():
+    """设置日志记录"""
+    # 获取程序所在目录
+    app_dir = os.path.dirname(os.path.abspath(__file__))
+    log_dir = os.path.join(app_dir, "logs")
+    
+    # 创建日志目录
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+    
+    # 日志文件名：edge_tts_web_YYYYMMDD.log
+    today = datetime.datetime.now().strftime("%Y%m%d")
+    log_file = os.path.join(log_dir, f"edge_tts_web_{today}.log")
+    
+    # 配置日志格式
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s [%(levelname)s] %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S',
+        handlers=[
+            # 输出到文件
+            logging.FileHandler(log_file, encoding='utf-8'),
+            # 输出到控制台
+            logging.StreamHandler(sys.stdout)
+        ]
+    )
+    
+    return logging.getLogger(__name__), log_file
+
+# 初始化日志
+logger, LOG_FILE = setup_logging()
+logger.info("=" * 50)
+logger.info("Edge TTS Web 服务初始化")
+logger.info(f"日志文件: {LOG_FILE}")
+logger.info("=" * 50)
 
 app = FastAPI()
 
@@ -135,11 +175,14 @@ async def get_voices():
 async def my_function(text, output, voice, rate):
     volume = '+0%'
     try:
+        logger.info(f"开始合成语音: voice={voice}, rate={rate}, text_length={len(text)}")
         tts = edge_tts.Communicate(text=text, voice=voice, rate=rate, volume=volume)
         await tts.save(output)
+        logger.info(f"语音合成成功: {output}")
         return True
     except Exception as e:
-        print(f"TTS Error: {e}")
+        logger.error(f"TTS合成失败: {e}")
+        logger.error(traceback.format_exc())
         return False
 
 
@@ -179,7 +222,10 @@ async def synthesize(request: Request):
         voice = data.get("voice", "zh-CN-XiaoxiaoNeural")
         rate = data.get("rate", "+0%")
         
+        logger.info(f"收到合成请求: voice={voice}, rate={rate}")
+        
         if not text:
+            logger.warning("文本为空，拒绝请求")
             return JSONResponse(
                 content={"message": "error", "error": "文本不能为空"},
                 status_code=400
@@ -216,7 +262,8 @@ async def synthesize(request: Request):
         })
     
     except Exception as e:
-        print(f"Synthesize Error: {e}")
+        logger.error(f"合成请求处理失败: {e}")
+        logger.error(traceback.format_exc())
         return JSONResponse(
             content={"message": "error", "error": str(e)},
             status_code=500
@@ -260,7 +307,6 @@ async def download(filename: str):
 
 if __name__ == "__main__":
     import uvicorn
-    import sys
     
     print("=" * 50)
     print("  Edge TTS Web 服务启动中...")
@@ -270,19 +316,31 @@ if __name__ == "__main__":
     print("  http://localhost:8000")
     print()
     print("  按 Ctrl+C 停止服务")
+    print()
+    print(f"  日志文件: {LOG_FILE}")
     print("=" * 50)
     print()
+    
+    logger.info("服务启动中...")
+    logger.info(f"Python版本: {sys.version}")
+    logger.info(f"工作目录: {os.getcwd()}")
+    logger.info(f"程序目录: {os.path.dirname(os.path.abspath(__file__))}")
     
     try:
         uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False)
     except KeyboardInterrupt:
+        logger.info("用户中断，服务停止")
         print()
         print("服务已停止")
     except Exception as e:
+        logger.critical(f"服务启动失败: {e}")
+        logger.critical(traceback.format_exc())
         print()
         print("=" * 50)
         print("  启动失败！错误信息：")
         print(f"  {e}")
+        print()
+        print(f"  详细日志请查看: {LOG_FILE}")
         print("=" * 50)
         print()
         input("按回车键退出...")
