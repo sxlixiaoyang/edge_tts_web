@@ -76,6 +76,13 @@ def get_resource_path(relative_path):
 
 # 创建模板目录路径
 templates_dir = get_resource_path("templates")
+logger.info(f"模板目录路径: {templates_dir}")
+logger.info(f"模板目录是否存在: {os.path.exists(templates_dir)}")
+if os.path.exists(templates_dir):
+    logger.info(f"模板目录内容: {os.listdir(templates_dir)}")
+
+# 使用 FileSystemLoader 替代直接传递目录路径
+from jinja2 import FileSystemLoader
 templates = Jinja2Templates(directory=templates_dir)
 
 # 创建mp3目录（放在exe所在目录，而不是临时目录）
